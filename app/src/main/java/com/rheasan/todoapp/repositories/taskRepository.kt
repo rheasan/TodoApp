@@ -6,6 +6,7 @@ import com.rheasan.todoapp.models.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Date
 import java.util.UUID
 
@@ -45,7 +46,9 @@ class TaskRepositoryClass : TaskRepository {
         }
         for(location in saveLocations) {
             if (location.name == locationType) {
-                return location.getAllTasks()
+                return runBlocking {
+                    location.getAllTasks().filter { it.deletedAt == null }
+                }
             }
         }
         return listOf()
@@ -57,8 +60,10 @@ class TaskRepositoryClass : TaskRepository {
                 break
             }
         }
-        for(location in saveLocations) {
-            location.deleteTask(id)
+        CoroutineScope(Dispatchers.IO).launch {
+            for(location in saveLocations) {
+                location.deleteTask(id)
+            }
         }
     }
 

@@ -56,7 +56,7 @@ interface TaskDao {
     @Insert
     fun insertNewTask(task: Task)
 
-    @Query("SELECT * from task where `deletedAt` not null")
+    @Query("SELECT * from task")
     fun getAllTasks() : List<Task>
 
     @Query("SELECT * from task where id = :taskId")
