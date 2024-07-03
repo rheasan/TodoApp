@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="86dp">
+
+        <TextView
+            android:id="@+id/taskCardTitle"
+            android:layout_width="197dp"
+            android:layout_height="80dp"
+            android:padding="15dp"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/taskCardEditButton"
+            android:layout_width="98dp"
+            android:layout_height="56dp"
+            android:text="Edit"
+            app:layout_constraintBottom_toBottomOf="@+id/taskCardTitle"
+            app:layout_constraintStart_toEndOf="@+id/taskCardTitle"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/taskCardDeleteButton"
+            android:layout_width="98dp"
+            android:layout_height="56dp"
+            android:text="Delete"
+            app:layout_constraintBottom_toBottomOf="@+id/taskCardTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/taskCardEditButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

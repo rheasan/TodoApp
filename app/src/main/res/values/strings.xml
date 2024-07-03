@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TodoApp</string>
+    <string name="task_placeholder">Task…</string>
+    <string name="add_task_button_label">Add</string>
+    <string name="loading_text">Loading…</string>
+    <string name="offline_header">Offline dev\'s TODOs</string>
+    <string name="empty_string" />
+</resources>
