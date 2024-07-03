@@ -53,11 +53,9 @@ class TaskAdapter : RecyclerView.Adapter<TaskViewHolder>() {
             }
         }
         holder.taskDeleteButton.setOnClickListener {
+            removeTaskAt(position)
             CoroutineScope(Dispatchers.IO).launch {
                 repository.deleteTask(currentTask.id)
-                withContext(Dispatchers.Main) {
-                    removeTaskAt(position)
-                }
             }
         }
     }

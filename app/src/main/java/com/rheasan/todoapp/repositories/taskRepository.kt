@@ -1,11 +1,10 @@
 package com.rheasan.todoapp.repositories
 
-import com.rheasan.todoapp.models.SaveLocation
-import com.rheasan.todoapp.models.SaveLocationType
+import com.rheasan.todoapp.models.ReadLocation
+import com.rheasan.todoapp.models.TaskLocations
 import com.rheasan.todoapp.models.Task
-import kotlinx.coroutines.CoroutineScope
+import com.rheasan.todoapp.models.WorkManagerHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -14,19 +13,20 @@ import java.util.UUID
 interface TaskRepository {
     fun generateMockData()
     fun getAllTasks() : List<Task>
+    fun getRepoTasks() : List<Task>
     fun deleteTask(id: UUID)
     fun updateTaskTitle(id: UUID, newTitle: String)
     fun addTask(task: Task)
-    fun addSaveLocation(saveLocation: SaveLocation)
-    fun setDefaultReadLocation(saveLocationType: SaveLocationType)
+    fun addReadLocation(readLocation: ReadLocation)
+    fun setDefaultReadLocation(taskLocations: TaskLocations)
 }
 
 
 
 class TaskRepositoryClass : TaskRepository {
     private val tasks: MutableList<Task> = mutableListOf()
-    private val saveLocations: MutableMap<SaveLocationType, SaveLocation> = mutableMapOf()
-    private var defaultReadLocation : SaveLocationType? = null
+    private val readLocations: MutableMap<TaskLocations, ReadLocation> = mutableMapOf()
+    private var defaultReadLocation : TaskLocations? = null
 
     override fun generateMockData() {
         for(i in 0..10) {
@@ -39,12 +39,12 @@ class TaskRepositoryClass : TaskRepository {
             ))
         }
     }
-    override fun addSaveLocation(saveLocation: SaveLocation) {
-        saveLocations[saveLocation.name] =  saveLocation
+    override fun addReadLocation(readLocation: ReadLocation) {
+        readLocations[readLocation.name] =  readLocation
     }
 
-    override fun setDefaultReadLocation(saveLocationType: SaveLocationType) {
-        defaultReadLocation = saveLocationType
+    override fun setDefaultReadLocation(taskLocations: TaskLocations) {
+        defaultReadLocation = taskLocations
     }
 
     override fun getAllTasks() : List<Task> {
@@ -53,8 +53,8 @@ class TaskRepositoryClass : TaskRepository {
         }
         return runBlocking {
             withContext(Dispatchers.IO){
-                val saveLocation = saveLocations[defaultReadLocation]!!
-                saveLocation.getAllTasks()
+                val readLocation = readLocations[defaultReadLocation]!!
+                readLocation.getAllTasks()
             }
         }
     }
@@ -65,11 +65,7 @@ class TaskRepositoryClass : TaskRepository {
                 break
             }
         }
-        CoroutineScope(Dispatchers.IO).launch {
-            for((_, location) in saveLocations) {
-                location.deleteTask(id)
-            }
-        }
+        WorkManagerHelper.enqueueDeleteTask(id)
     }
 
     override fun updateTaskTitle(id: UUID, newTitle: String) {
@@ -80,20 +76,16 @@ class TaskRepositoryClass : TaskRepository {
                 break
             }
         }
-        CoroutineScope(Dispatchers.IO).launch {
-            for((_, location) in saveLocations) {
-                location.updateTitle(id, newTitle)
-            }
-        }
+        WorkManagerHelper.enqueueUpdateTitleTask(id, newTitle)
     }
 
     override fun addTask(task: Task) {
         tasks.add(task)
-        CoroutineScope(Dispatchers.IO).launch {
-            for((_, location) in saveLocations) {
-                location.addTask(task)
-            }
-        }
+        WorkManagerHelper.enqueueAddTask(task)
+    }
+
+    override fun getRepoTasks() : List<Task> {
+        return tasks
     }
 }
 object TaskRepositoryInstance {

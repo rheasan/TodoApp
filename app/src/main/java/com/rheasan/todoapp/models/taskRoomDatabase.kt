@@ -12,8 +12,6 @@ import androidx.room.TypeConverters
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.UUID
 
@@ -85,17 +83,17 @@ interface TaskDao {
 //    }
 //}
 
-class RoomDBProxy(context: Context) : SaveLocation {
-    override var name = SaveLocationType.localRoomDb
+class RoomDBProxy(context: Context) : ReadLocation, WriteLocation {
+    override var name = TaskLocations.LocalRoomDB
     private var db : TaskDB = TaskDB.getInstance(context)
 
-    override fun addTask(task: Task) {
+    override suspend fun addTask(task: Task) {
         CoroutineScope(Dispatchers.IO).launch {
             db.taskDao().insertNewTask(task)
         }
     }
 
-    override fun updateTitle(id: UUID, newTitle: String) {
+    override suspend fun updateTitle(id: UUID, newTitle: String) {
         CoroutineScope(Dispatchers.IO).launch {
             db.taskDao().updateTaskTitle(id, newTitle)
         }
@@ -109,7 +107,7 @@ class RoomDBProxy(context: Context) : SaveLocation {
         return db.taskDao().getAllTasks()
     }
 
-    override fun deleteTask(id: UUID) {
+    override suspend fun deleteTask(id: UUID) {
         CoroutineScope(Dispatchers.IO).launch {
             db.taskDao().taskSetDeleted(id)
         }

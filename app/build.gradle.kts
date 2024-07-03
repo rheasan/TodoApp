@@ -82,4 +82,8 @@ dependencies {
     // firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.database)
+
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
 }

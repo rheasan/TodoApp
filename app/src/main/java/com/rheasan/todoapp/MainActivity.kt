@@ -13,8 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.FirebaseApp
 import com.rheasan.todoapp.models.FirebaseHelper
 import com.rheasan.todoapp.models.RoomDBProxy
-import com.rheasan.todoapp.models.SaveLocationType
+import com.rheasan.todoapp.models.TaskLocations
 import com.rheasan.todoapp.models.Task
+import com.rheasan.todoapp.models.WorkManagerHelper
 import com.rheasan.todoapp.models.updateDevName
 import com.rheasan.todoapp.repositories.TaskRepository
 import com.rheasan.todoapp.repositories.TaskRepositoryInstance
@@ -52,9 +53,14 @@ class MainActivity : AppCompatActivity() {
 
         // setup task repository
         repository = TaskRepositoryInstance.getInstance()
-        repository.setDefaultReadLocation(SaveLocationType.firebase)
-        repository.addSaveLocation(RoomDBProxy(this))
-        repository.addSaveLocation(FirebaseHelper())
+        repository.setDefaultReadLocation(TaskLocations.Firebase)
+        repository.addReadLocation(RoomDBProxy(this))
+        repository.addReadLocation(FirebaseHelper())
+
+        // setup workmanager
+        WorkManagerHelper.setupWorkers(this)
+        WorkManagerHelper.addWriteLocations(FirebaseHelper())
+        WorkManagerHelper.addWriteLocations(RoomDBProxy(this))
 
         // update the header text
         updateDevName(headerTextView, this)

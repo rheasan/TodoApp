@@ -4,18 +4,17 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
-import java.util.concurrent.CountDownLatch
 
-class FirebaseHelper : SaveLocation {
-    override var name: SaveLocationType = SaveLocationType.firebase
+class FirebaseHelper : ReadLocation, WriteLocation {
+    override var name: TaskLocations = TaskLocations.Firebase
     private val database = FirebaseDatabase.getInstance().reference.child("tasks")
 
-    override fun addTask(task: Task) {
+    override suspend fun addTask(task: Task) {
         val taskId = task.id.toString()
         database.child(taskId).setValue(task.convertToLongs())
     }
 
-    override fun updateTitle(id: UUID, newTitle: String) {
+    override suspend fun updateTitle(id: UUID, newTitle: String) {
         val taskId = id.toString()
         database.child(taskId).child("taskTitle").setValue(newTitle)
         database.child(taskId).child("updatedAt").setValue(ServerValue.TIMESTAMP)
@@ -39,7 +38,7 @@ class FirebaseHelper : SaveLocation {
         return tasks.filter { it.deletedAt == null }.map { it.convertToDates() }
     }
 
-    override fun deleteTask(id: UUID) {
+    override suspend fun deleteTask(id: UUID) {
         val taskId = id.toString()
         database.child(taskId).child("deletedAt").setValue(ServerValue.TIMESTAMP)
     }
