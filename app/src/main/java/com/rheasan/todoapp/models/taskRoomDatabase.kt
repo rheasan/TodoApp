@@ -101,20 +101,12 @@ class RoomDBProxy(context: Context) : SaveLocation {
         }
     }
 
-    override fun getTask(id: UUID): Task {
-        return runBlocking {
-            withContext(Dispatchers.IO) {
-                db.taskDao().getTask(id)
-            }
-        }
+    override suspend fun getTask(id: UUID): Task {
+        return db.taskDao().getTask(id)
     }
 
-    override fun getAllTasks(): List<Task> {
-        return runBlocking {
-            withContext(Dispatchers.IO) {
-                db.taskDao().getAllTasks()
-            }
-        }
+    override suspend fun getAllTasks(): List<Task> {
+        return db.taskDao().getAllTasks()
     }
 
     override fun deleteTask(id: UUID) {

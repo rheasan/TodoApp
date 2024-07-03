@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.rheasan.todoapp.R
-import com.rheasan.todoapp.models.SaveLocationType
 import com.rheasan.todoapp.models.Task
 import com.rheasan.todoapp.repositories.TaskRepository
 import com.rheasan.todoapp.repositories.TaskRepositoryInstance
@@ -19,7 +18,7 @@ class TaskAdapter : RecyclerView.Adapter<TaskViewHolder>() {
     private var tasks: MutableList<Task>
     init {
         repository = TaskRepositoryInstance.getInstance()
-        tasks = repository.getAllTasks(SaveLocationType.localRoomDb).toMutableList()
+        tasks = repository.getAllTasks().toMutableList()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {

@@ -7,23 +7,26 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.UUID
 
 interface TaskRepository {
     fun generateMockData()
-    fun getAllTasks(locationType: SaveLocationType?) : List<Task>
+    fun getAllTasks() : List<Task>
     fun deleteTask(id: UUID)
     fun updateTaskTitle(id: UUID, newTitle: String)
     fun addTask(task: Task)
     fun addSaveLocation(saveLocation: SaveLocation)
+    fun setDefaultReadLocation(saveLocationType: SaveLocationType)
 }
 
 
 
 class TaskRepositoryClass : TaskRepository {
-    private var tasks: MutableList<Task> = mutableListOf()
-    private var saveLocations: MutableList<SaveLocation> = mutableListOf()
+    private val tasks: MutableList<Task> = mutableListOf()
+    private val saveLocations: MutableMap<SaveLocationType, SaveLocation> = mutableMapOf()
+    private var defaultReadLocation : SaveLocationType? = null
 
     override fun generateMockData() {
         for(i in 0..10) {
@@ -35,23 +38,25 @@ class TaskRepositoryClass : TaskRepository {
                 deletedAt = null
             ))
         }
-
     }
     override fun addSaveLocation(saveLocation: SaveLocation) {
-        saveLocations.add(saveLocation)
+        saveLocations[saveLocation.name] =  saveLocation
     }
-    override fun getAllTasks(locationType: SaveLocationType?) : List<Task> {
-        if(saveLocations.isEmpty()) {
-            return tasks.filter {it.deletedAt == null}
+
+    override fun setDefaultReadLocation(saveLocationType: SaveLocationType) {
+        defaultReadLocation = saveLocationType
+    }
+
+    override fun getAllTasks() : List<Task> {
+        if(defaultReadLocation == null){
+            return listOf()
         }
-        for(location in saveLocations) {
-            if (location.name == locationType) {
-                return runBlocking {
-                    location.getAllTasks().filter { it.deletedAt == null }
-                }
+        return runBlocking {
+            withContext(Dispatchers.IO){
+                val saveLocation = saveLocations[defaultReadLocation]!!
+                saveLocation.getAllTasks()
             }
         }
-        return listOf()
     }
     override fun deleteTask(id: UUID) {
         for(task in tasks) {
@@ -61,7 +66,7 @@ class TaskRepositoryClass : TaskRepository {
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
-            for(location in saveLocations) {
+            for((_, location) in saveLocations) {
                 location.deleteTask(id)
             }
         }
@@ -76,7 +81,7 @@ class TaskRepositoryClass : TaskRepository {
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
-            for(location in saveLocations) {
+            for((_, location) in saveLocations) {
                 location.updateTitle(id, newTitle)
             }
         }
@@ -85,7 +90,7 @@ class TaskRepositoryClass : TaskRepository {
     override fun addTask(task: Task) {
         tasks.add(task)
         CoroutineScope(Dispatchers.IO).launch {
-            for(location in saveLocations) {
+            for((_, location) in saveLocations) {
                 location.addTask(task)
             }
         }
