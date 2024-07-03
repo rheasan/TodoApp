@@ -1,4 +1,5 @@
 package com.rheasan.todoapp.viewModels
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +36,23 @@ class TaskAdapter : RecyclerView.Adapter<TaskViewHolder>() {
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val currentTask = tasks[position]
         holder.taskTitle.text = currentTask.taskTitle
+        holder.taskEditButton.setOnClickListener {
+            if(holder.taskTitle.inputType == InputType.TYPE_NULL) {
+                // enable the textEdit
+                holder.taskTitle.inputType = InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE
+                holder.taskTitle.isFocusableInTouchMode = true
+                holder.taskEditButton.text = "Submit"
+            }
+            else {
+                // disable
+                holder.taskTitle.inputType = InputType.TYPE_NULL
+                holder.taskEditButton.text = "Edit"
+                CoroutineScope(Dispatchers.IO).launch {
+                    val newTitle = holder.taskTitle.text.toString()
+                    repository.updateTaskTitle(currentTask.id, newTitle)
+                }
+            }
+        }
         holder.taskDeleteButton.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
                 repository.deleteTask(currentTask.id)

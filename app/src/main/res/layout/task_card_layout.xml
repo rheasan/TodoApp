@@ -8,13 +8,18 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="86dp">
+        android:layout_height="86dp"
+        tools:ignore="VisualLintBounds">
 
-        <TextView
+        <EditText
             android:id="@+id/taskCardTitle"
-            android:layout_width="197dp"
-            android:layout_height="80dp"
+            android:layout_width="188dp"
+            android:layout_height="69dp"
+            android:hint="@string/task_title_label"
+            android:inputType="none"
+            android:focusable="false"
             android:padding="15dp"
+            android:textColorHint="#757575"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +30,7 @@
             android:layout_width="98dp"
             android:layout_height="56dp"
             android:text="Edit"
-            app:layout_constraintBottom_toBottomOf="@+id/taskCardTitle"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/taskCardTitle"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,7 +39,7 @@
             android:layout_width="98dp"
             android:layout_height="56dp"
             android:text="Delete"
-            app:layout_constraintBottom_toBottomOf="@+id/taskCardTitle"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/taskCardEditButton"
             app:layout_constraintTop_toTopOf="parent" />

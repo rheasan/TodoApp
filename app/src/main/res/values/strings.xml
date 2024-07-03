@@ -5,4 +5,5 @@
     <string name="loading_text">Loading…</string>
     <string name="offline_header">Offline dev\'s TODOs</string>
     <string name="empty_string" />
+    <string name="task_title_label">Title of Task</string>
 </resources>
