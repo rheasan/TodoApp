@@ -1,7 +1,12 @@
-package com.rheasan.todoapp.models
+package com.rheasan.todoapp.models.db
 
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
+import com.rheasan.todoapp.models.FirebaseSafeTask
+import com.rheasan.todoapp.models.ReadLocation
+import com.rheasan.todoapp.models.Task
+import com.rheasan.todoapp.models.TaskLocations
+import com.rheasan.todoapp.models.WriteLocation
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 

@@ -10,22 +10,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.FirebaseApp
-import com.rheasan.todoapp.models.FirebaseHelper
-import com.rheasan.todoapp.models.RoomDBProxy
-import com.rheasan.todoapp.models.TaskLocations
-import com.rheasan.todoapp.models.Task
-import com.rheasan.todoapp.models.WorkManagerHelper
-import com.rheasan.todoapp.models.updateDevName
-import com.rheasan.todoapp.repositories.TaskRepository
-import com.rheasan.todoapp.repositories.TaskRepositoryInstance
-import com.rheasan.todoapp.viewModels.TaskAdapter
+import com.rheasan.todoapp.viewModels.MainActivityViewModel
+import com.rheasan.todoapp.adapters.TaskAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Date
-import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,16 +23,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var addTaskButton : Button
     private lateinit var taskEditText: EditText
 
-    private lateinit var repository: TaskRepository
-
+    private lateinit var viewModel : MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-
-        // initialize firebase
-        FirebaseApp.initializeApp(this)
+        viewModel = MainActivityViewModel(this)
 
         headerTextView = findViewById(R.id.headerTextView)
         taskRecyclerView = findViewById(R.id.taskRecyclerView)
@@ -51,45 +37,25 @@ class MainActivity : AppCompatActivity() {
         taskEditText = findViewById(R.id.taskTitleEditText)
         headerTextView.text = getString(R.string.loading_text)
 
-        // setup task repository
-        repository = TaskRepositoryInstance.getInstance()
-        repository.setDefaultReadLocation(TaskLocations.Firebase)
-        repository.addReadLocation(RoomDBProxy(this))
-        repository.addReadLocation(FirebaseHelper())
-
-        // setup workmanager
-        WorkManagerHelper.setupWorkers(this)
-        WorkManagerHelper.addWriteLocations(FirebaseHelper())
-        WorkManagerHelper.addWriteLocations(RoomDBProxy(this))
 
         // update the header text
-        updateDevName(headerTextView, this)
+        CoroutineScope(Dispatchers.IO).launch {
+            val name = viewModel.devName()
+            headerTextView.text = getString(R.string.todo_header, name)
+        }
 
-        // add tasks to the recycler view
+        // setup recyclerView
         val layoutManager = LinearLayoutManager(this)
         taskRecyclerView.layoutManager = layoutManager
         val adapter = TaskAdapter()
         taskRecyclerView.adapter = adapter
 
         // add new tasks
-
         addTaskButton.setOnClickListener {
             val taskTitle = taskEditText.text.toString()
-            if (taskTitle.isNotEmpty()) {
-                val newTask = Task(
-                    id = UUID.randomUUID(),
-                    createdAt = Date(),
-                    updatedAt = Date(),
-                    deletedAt = null,
-                    taskTitle = taskTitle
-                )
-                CoroutineScope(Dispatchers.IO).launch {
-                    repository.addTask(newTask)
-                    withContext(Dispatchers.Main) {
-                        taskEditText.setText(getString(R.string.empty_string))
-                        adapter.addTask(newTask)
-                    }
-                }
+            taskEditText.setText(R.string.empty_string)
+            viewModel.createTask(taskTitle)?.let {
+                adapter.addTask(it)
             }
         }
 

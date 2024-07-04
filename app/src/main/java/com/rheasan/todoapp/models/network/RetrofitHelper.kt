@@ -1,4 +1,4 @@
-package com.rheasan.todoapp.network
+package com.rheasan.todoapp.models.network
 
 import retrofit2.Response
 import retrofit2.Retrofit

@@ -25,7 +25,7 @@ object WorkManagerHelper {
         return writeLocations
     }
     fun setupWorkers(context: Context) {
-        workManager =  WorkManager.getInstance(context.applicationContext)
+        workManager =  WorkManager.getInstance(context)
     }
 
     fun enqueueDeleteTask(id: UUID) {

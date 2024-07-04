@@ -1,4 +1,4 @@
-package com.rheasan.todoapp.models
+package com.rheasan.todoapp.models.db
 
 import android.content.Context
 import androidx.room.Dao
@@ -9,6 +9,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.rheasan.todoapp.models.ReadLocation
+import com.rheasan.todoapp.models.Task
+import com.rheasan.todoapp.models.TaskLocations
+import com.rheasan.todoapp.models.WriteLocation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +44,7 @@ abstract class TaskDB : RoomDatabase() {
             synchronized(lock) {
                 if (INSTANCE == null) {
                     INSTANCE = Room
-                        .databaseBuilder(context.applicationContext, TaskDB::class.java, "tasks")
+                        .databaseBuilder(context, TaskDB::class.java, "tasks")
                         .build()
                 }
                 return INSTANCE!!
